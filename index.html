@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monetag Auto Mathod</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<!-- ✅ Dual Zone SDK -->
+<script src='//libtl.com/sdk.js' data-zone='10906788' data-sdk='show_10906788'></script>
+<script src='//libtl.com/sdk.js' data-zone='10906806' data-sdk='show_10906806'></script>
+
+<style>
+body {
+  margin:0;height:100vh;font-family:'Segoe UI',sans-serif;
+  background:radial-gradient(circle at top,#1a2a6c,#000);
+  display:flex;justify-content:center;align-items:center;color:#fff;
+}
+.card {
+  width:350px;padding:25px;border-radius:20px;
+  background:rgba(0,0,0,0.6);text-align:center;
+}
+button {
+  padding:12px 15px;border:none;border-radius:10px;
+  background:#00e5ff;color:#000;font-weight:bold;cursor:pointer;
+}
+.timer {margin-top:10px;font-size:18px;color:#4caf50;}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>🚀 Auto Ads System</h2>
+  <button onclick="enableAuto()">Auto Start</button>
+
+  <div class="timer">
+    Next Ads in <span id="countdown">20</span>s
+  </div>
+
+  <!-- ✅ Ad Count Display -->
+  <div class="timer">
+    Ads Watched: <span id="adCount">0</span>
+  </div>
+</div>
+
+<script>
+const tg = window.Telegram.WebApp;
+tg.ready();
+
+let timerInterval;
+let timeLeft = 20;
+
+// ✅ Ad Count System
+let adCount = localStorage.getItem("adCount") 
+  ? parseInt(localStorage.getItem("adCount")) 
+  : 0;
+
+const adCountElement = document.getElementById("adCount");
+adCountElement.textContent = adCount;
+
+// ✅ FIX: localStorage থেকে zone load
+let currentZone = localStorage.getItem("zone") 
+  ? parseInt(localStorage.getItem("zone")) 
+  : 1;
+
+// ✅ SMART SHOW (Dual Zone)
+function showAdSmart() {
+
+  // 🔹 Next Level Fix: user-initiated click simulation
+  let openAd = null;
+  if (currentZone === 1 && typeof show_10906788 === "function") {
+    openAd = show_10906788;
+  } 
+  else if (currentZone === 2 && typeof show_10906806 === "function") {
+    openAd = show_10906806;
+  }
+
+  if(openAd){
+    // একটি temporary user click event trigger
+    const clickEvent = new MouseEvent('click', {bubbles:true, cancelable:true, view:window});
+    document.body.dispatchEvent(clickEvent);
+    openAd().catch(()=>{}); // ad call
+
+    // ✅ Update Ad Count
+    adCount++;
+    localStorage.setItem("adCount", adCount);
+    adCountElement.textContent = adCount;
+  }
+
+  // 🔁 rotate zone
+  currentZone = (currentZone === 1) ? 2 : 1;
+
+  // ✅ SAVE zone
+  localStorage.setItem("zone", currentZone);
+}
+
+// ✅ AUTO TIMER + RELOAD
+function startAutoTimer() {
+  clearInterval(timerInterval);
+
+  timeLeft = 20;
+  document.getElementById("countdown").textContent = timeLeft;
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    document.getElementById("countdown").textContent = timeLeft;
+
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      setTimeout(()=>{ location.reload(); }, 2000); // 🔹 2 sec delay before reload
+    }
+  }, 1000);
+}
+
+// ✅ AUTO START
+function enableAuto() {
+  localStorage.setItem("adMode", "auto");
+
+  showAdSmart(); // first ad
+  startAutoTimer();
+}
+
+// 🔥 FINAL FIX (Auto + Reload Continue BOTH)
+window.addEventListener("load", () => {
+
+  // সব সময় auto mode on
+  localStorage.setItem("adMode", "auto");
+
+  // auto run
+  showAdSmart();
+  startAutoTimer();
+
+});
+</script>
+
+</body>
+</html>
